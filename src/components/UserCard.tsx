@@ -24,37 +24,41 @@ export const UserCard = ({
   user,
 }: UserCardProps) => (
   <View style={styles.card}>
-    <View style={styles.header}>
-      <Checkbox
-        color={isSelected ? colors.secondary : undefined}
-        disabled={!canToggleSelection && !isSelected}
-        onValueChange={onToggleSelection}
-        style={styles.checkbox}
-        value={isSelected}
-      />
-      <Image source={{ uri: user.avatar }} style={styles.avatar} />
-      <View style={styles.identity}>
-        <Text style={styles.name}>{user.fullName}</Text>
-        <Text numberOfLines={1} style={styles.email}>
-          {user.email}
-        </Text>
+    <View style={styles.contentRow}>
+      <View style={styles.mainColumn}>
+        <View style={styles.header}>
+          <Checkbox
+            color={isSelected ? colors.secondary : undefined}
+            disabled={!canToggleSelection && !isSelected}
+            onValueChange={onToggleSelection}
+            style={styles.checkbox}
+            value={isSelected}
+          />
+          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          <View style={styles.identity}>
+            <Text style={styles.name}>{user.fullName}</Text>
+            <Text numberOfLines={1} style={styles.email}>
+              {user.email}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.body}>
+          <Text style={styles.location}>
+            {user.location.city}, {user.location.country}
+          </Text>
+          <Text style={styles.phone}>Teléfono original: {user.phone}</Text>
+        </View>
       </View>
-    </View>
 
-    <View style={styles.body}>
-      <Text style={styles.location}>
-        {user.location.city}, {user.location.country}
-      </Text>
-      <Text style={styles.phone}>Teléfono original: {user.phone}</Text>
-    </View>
-
-    <View style={styles.actions}>
-      <Pressable onPress={onPressDetail} style={[styles.button, styles.secondaryButton]}>
-        <Text style={[styles.buttonText, styles.secondaryButtonText]}>Ver detalle</Text>
-      </Pressable>
-      <Pressable onPress={onPressFavorite} style={[styles.button, isFavorite && styles.favoriteButton]}>
-        <Text style={styles.buttonText}>{isFavorite ? 'Quitar favorito' : 'Favorito'}</Text>
-      </Pressable>
+      <View style={styles.actionsColumn}>
+        <Pressable onPress={onPressDetail} style={[styles.button, styles.secondaryButton]}>
+          <Text style={[styles.buttonText, styles.secondaryButtonText]}>Ver detalle</Text>
+        </Pressable>
+        <Pressable onPress={onPressFavorite} style={[styles.button, isFavorite && styles.favoriteButton]}>
+          <Text style={styles.buttonText}>{isFavorite ? 'Quitar favorito' : 'Favorito'}</Text>
+        </Pressable>
+      </View>
     </View>
   </View>
 );
@@ -66,6 +70,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  contentRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  mainColumn: {
+    flex: 1,
     gap: spacing.md,
   },
   header: {
@@ -106,12 +117,12 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 13,
   },
-  actions: {
-    flexDirection: 'row',
+  actionsColumn: {
+    width: 118,
+    justifyContent: 'space-between',
     gap: spacing.sm,
   },
   button: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 42,
@@ -129,6 +140,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#FFFFFF',
+    textAlign: 'center',
   },
   secondaryButtonText: {
     color: colors.primary,

@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Screen } from '../components/Screen';
 import { StatusView } from '../components/StatusView';
@@ -85,6 +85,8 @@ export const UserDetailScreen = ({ navigation, route }: UserDetailScreenProps) =
 
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>Información de contacto</Text>
+          <DetailRow label="Nombre completo" value={user.fullName} />
+          <DetailRow label="Apellido" value={user.lastName} />
           <DetailRow label="Correo electrónico" value={user.email} />
           <DetailRow label="Teléfono original" value={user.phone} />
           <DetailRow label="Edad" value={`${user.age} años`} />
@@ -100,6 +102,7 @@ export const UserDetailScreen = ({ navigation, route }: UserDetailScreenProps) =
 
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>Teléfono local editable</Text>
+          <DetailRow label="Teléfono local guardado" value={getLocalPhone(user.id, 'Sin registrar')} />
           <Text style={styles.inputLabel}>Número de teléfono local</Text>
           <TextInput
             keyboardType="phone-pad"

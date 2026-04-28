@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text } from 'react-native';
 
 import { colors, radius, spacing } from '../constants/theme';
 import { User } from '../types/user';
@@ -17,6 +17,7 @@ export const FavoriteUserCard = ({ onPress, user }: FavoriteUserCardProps) => (
     <Text numberOfLines={1} style={styles.subtitle}>
       {user.location.city}
     </Text>
+    <Text style={styles.action}>Ver detalle</Text>
   </Pressable>
 );
 
@@ -45,5 +46,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     fontSize: 12,
     color: colors.textMuted,
+  },
+  action: {
+    marginTop: spacing.sm,
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.secondary,
   },
 });
