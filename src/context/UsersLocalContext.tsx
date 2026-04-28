@@ -12,6 +12,7 @@ type UserLocalState = {
 type UsersLocalContextValue = UserLocalState & {
   toggleFavorite: (userId: string) => void;
   addManyFavorites: (userIds: string[]) => void;
+  removeManyFavorites: (userIds: string[]) => void;
   toggleSelectedOrdered: (userId: string, orderedUsers: User[]) => boolean;
   selectAll: (orderedUsers: User[]) => void;
   clearSelection: () => void;
@@ -52,6 +53,17 @@ export const UsersLocalProvider = ({ children }: PropsWithChildren) => {
             return accumulator;
           }, { ...current }),
         );
+      },
+      removeManyFavorites: (userIds) => {
+        setFavorites((current) => {
+          const next = { ...current };
+
+          userIds.forEach((userId) => {
+            delete next[userId];
+          });
+
+          return next;
+        });
       },
       toggleSelectedOrdered: (userId, orderedUsers) => {
         let wasApplied = false;

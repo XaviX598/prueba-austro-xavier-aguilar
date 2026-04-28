@@ -1,5 +1,5 @@
 import Checkbox from 'expo-checkbox';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { colors, radius, spacing } from '../constants/theme';
 import { User } from '../types/user';
@@ -22,46 +22,54 @@ export const UserCard = ({
   onPressFavorite,
   onToggleSelection,
   user,
-}: UserCardProps) => (
-  <View style={styles.card}>
-    <View style={styles.contentRow}>
-      <View style={styles.mainColumn}>
-        <View style={styles.header}>
-          <Checkbox
-            color={isSelected ? colors.secondary : undefined}
-            disabled={!canToggleSelection && !isSelected}
-            onValueChange={onToggleSelection}
-            style={styles.checkbox}
-            value={isSelected}
-          />
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
-          <View style={styles.identity}>
-            <Text style={styles.name}>{user.fullName}</Text>
-            <Text numberOfLines={1} style={styles.email}>
-              {user.email}
+}: UserCardProps) => {
+  const { width } = useWindowDimensions();
+  const isNarrow = width <= 361;
+
+  return (
+    <View style={styles.card}>
+      <View style={[styles.contentRow, isNarrow && styles.contentRowNarrow]}>
+        <View style={styles.mainColumn}>
+          <View style={styles.header}>
+            <Checkbox
+              color={isSelected ? colors.secondary : undefined}
+              disabled={!canToggleSelection && !isSelected}
+              onValueChange={onToggleSelection}
+              style={styles.checkbox}
+              value={isSelected}
+            />
+            <Image source={{ uri: user.avatar }} style={styles.avatar} />
+            <View style={styles.identity}>
+              <Text style={[styles.name, isNarrow && styles.nameNarrow]}>{user.fullName}</Text>
+              <Text numberOfLines={1} style={styles.email}>
+                {user.email}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.body}>
+            <Text style={styles.location}>
+              {user.location.city}, {user.location.country}
             </Text>
+            <Text style={styles.phone}>Teléfono original: {user.phone}</Text>
           </View>
         </View>
 
-        <View style={styles.body}>
-          <Text style={styles.location}>
-            {user.location.city}, {user.location.country}
-          </Text>
-          <Text style={styles.phone}>Teléfono original: {user.phone}</Text>
+        <View style={[styles.actionsColumn, isNarrow && styles.actionsRowNarrow]}>
+          <Pressable onPress={onPressDetail} style={[styles.button, styles.secondaryButton, isNarrow && styles.buttonNarrow]}>
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Ver detalle</Text>
+          </Pressable>
+          <Pressable
+            onPress={onPressFavorite}
+            style={[styles.button, isFavorite && styles.favoriteButton, isNarrow && styles.buttonNarrow]}
+          >
+            <Text style={styles.buttonText}>{isFavorite ? 'Quitar favorito' : 'Favorito'}</Text>
+          </Pressable>
         </View>
       </View>
-
-      <View style={styles.actionsColumn}>
-        <Pressable onPress={onPressDetail} style={[styles.button, styles.secondaryButton]}>
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>Ver detalle</Text>
-        </Pressable>
-        <Pressable onPress={onPressFavorite} style={[styles.button, isFavorite && styles.favoriteButton]}>
-          <Text style={styles.buttonText}>{isFavorite ? 'Quitar favorito' : 'Favorito'}</Text>
-        </Pressable>
-      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -74,6 +82,9 @@ const styles = StyleSheet.create({
   contentRow: {
     flexDirection: 'row',
     gap: spacing.md,
+  },
+  contentRowNarrow: {
+    flexDirection: 'column',
   },
   mainColumn: {
     flex: 1,
@@ -101,6 +112,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
   },
+  nameNarrow: {
+    fontSize: 15,
+  },
   email: {
     color: colors.textMuted,
     fontSize: 13,
@@ -122,6 +136,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.sm,
   },
+  actionsRowNarrow: {
+    width: '100%',
+    flexDirection: 'row',
+  },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -129,6 +147,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: colors.primary,
     paddingHorizontal: spacing.md,
+  },
+  buttonNarrow: {
+    flex: 1,
   },
   secondaryButton: {
     backgroundColor: colors.primarySoft,

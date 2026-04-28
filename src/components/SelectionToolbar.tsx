@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { colors, radius, spacing } from '../constants/theme';
 
@@ -6,6 +6,7 @@ type SelectionToolbarProps = {
   helperText: string;
   onAddSelected: () => void;
   onClear: () => void;
+  onRemoveSelectedFavorites: () => void;
   onSelectAll: () => void;
   selectedCount: number;
   totalCount: number;
@@ -15,33 +16,53 @@ export const SelectionToolbar = ({
   helperText,
   onAddSelected,
   onClear,
+  onRemoveSelectedFavorites,
   onSelectAll,
   selectedCount,
   totalCount,
-}: SelectionToolbarProps) => (
-  <View style={styles.container}>
-    <View style={styles.summaryRow}>
-      <Text style={styles.title}>Selección ordenada</Text>
-      <Text style={styles.counter}>
-        {selectedCount}/{totalCount}
-      </Text>
-    </View>
-    <Text style={styles.helper}>{helperText}</Text>
+}: SelectionToolbarProps) => {
+  const { width } = useWindowDimensions();
+  const isNarrow = width <= 361;
 
-    <View style={styles.actions}>
-      <Pressable onPress={onSelectAll} style={[styles.button, styles.primaryButton]}>
-        <Text style={styles.primaryButtonText}>Seleccionar todos</Text>
-      </Pressable>
-      <Pressable onPress={onAddSelected} style={[styles.button, styles.secondaryButton]}>
-        <Text style={styles.secondaryButtonText}>Agregar favoritos</Text>
-      </Pressable>
-    </View>
+  return (
+    <View style={styles.container}>
+      <View style={[styles.summaryRow, isNarrow && styles.summaryRowNarrow]}>
+        <Text style={styles.title}>Selección ordenada</Text>
+        <Text style={styles.counter}>
+          {selectedCount}/{totalCount}
+        </Text>
+      </View>
 
-    <Pressable onPress={onClear}>
-      <Text style={styles.clearAction}>Limpiar selección</Text>
-    </Pressable>
-  </View>
-);
+      <Text style={styles.helper}>{helperText}</Text>
+
+      <View style={[styles.actions, isNarrow && styles.actionsNarrow]}>
+        <Pressable onPress={onSelectAll} style={[styles.button, styles.primaryButton, isNarrow && styles.fullButton]}>
+          <Text style={styles.primaryButtonText}>Seleccionar todos</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={onAddSelected}
+          style={[styles.button, styles.secondaryButton, isNarrow && styles.fullButton]}
+        >
+          <Text style={styles.secondaryButtonText}>Agregar favoritos</Text>
+        </Pressable>
+      </View>
+
+      <View style={[styles.actions, isNarrow && styles.actionsNarrow]}>
+        <Pressable
+          onPress={onRemoveSelectedFavorites}
+          style={[styles.button, styles.warningButton, isNarrow && styles.fullButton]}
+        >
+          <Text style={styles.warningButtonText}>Quitar favoritos seleccionados</Text>
+        </Pressable>
+
+        <Pressable onPress={onClear} style={[styles.button, styles.clearButton, isNarrow && styles.fullButton]}>
+          <Text style={styles.clearButtonText}>Limpiar selección</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -57,6 +78,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  summaryRowNarrow: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: spacing.xs,
   },
   title: {
     fontSize: 16,
@@ -77,6 +103,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.xs,
   },
+  actionsNarrow: {
+    flexDirection: 'column',
+  },
   button: {
     flex: 1,
     minHeight: 42,
@@ -92,6 +121,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 13,
+    textAlign: 'center',
   },
   secondaryButton: {
     backgroundColor: colors.primarySoft,
@@ -100,11 +130,31 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
     fontSize: 13,
-  },
-  clearAction: {
-    marginTop: spacing.xs,
-    color: colors.danger,
-    fontWeight: '600',
     textAlign: 'center',
+  },
+  warningButton: {
+    backgroundColor: '#FFF4E5',
+    borderWidth: 1,
+    borderColor: '#F4C27A',
+  },
+  warningButtonText: {
+    color: colors.warning,
+    fontWeight: '700',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  clearButton: {
+    backgroundColor: '#FFF5F4',
+    borderWidth: 1,
+    borderColor: '#F2B8B5',
+  },
+  clearButtonText: {
+    color: colors.danger,
+    fontWeight: '700',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  fullButton: {
+    width: '100%',
   },
 });

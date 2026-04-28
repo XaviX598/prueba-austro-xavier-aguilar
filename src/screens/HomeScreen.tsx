@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Alert, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { FavoriteUserCard } from '../components/FavoriteUserCard';
 import { Screen } from '../components/Screen';
@@ -17,12 +17,22 @@ import { canToggleOrderedSelection, getSelectionHint, isSelected } from '../util
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export const HomeScreen = ({ navigation }: HomeScreenProps) => {
+  const { width } = useWindowDimensions();
   const { data = [], isError, isFetching, isLoading, refetch } = useUsersQuery();
-  const { addManyFavorites, clearSelection, favorites, selectAll, selectedIds, toggleFavorite, toggleSelectedOrdered } =
-    useUsersLocalContext();
+  const {
+    addManyFavorites,
+    clearSelection,
+    favorites,
+    removeManyFavorites,
+    selectAll,
+    selectedIds,
+    toggleFavorite,
+    toggleSelectedOrdered,
+  } = useUsersLocalContext();
 
   const favoriteUsers = data.filter((user) => favorites[user.id]);
   const selectionHint = getSelectionHint(selectedIds, data);
+  const isNarrow = width <= 361;
 
   const handleNavigate = (userId: string) => {
     navigation.navigate('UserDetail', { userId });
@@ -51,6 +61,15 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
     }
 
     addManyFavorites(selectedIds);
+  };
+
+  const handleRemoveSelectedFavorites = () => {
+    if (selectedIds.length === 0) {
+      Alert.alert('Sin selección', 'Selecciona al menos un usuario para quitarlo de favoritos.');
+      return;
+    }
+
+    removeManyFavorites(selectedIds);
   };
 
   if (isLoading) {
@@ -100,10 +119,10 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
       <FlatList
         ListHeaderComponent={
           <View style={styles.headerContent}>
-            <LinearGradient colors={['#173A63', '#285C98']} style={styles.hero}>
+            <LinearGradient colors={['#173A63', '#285C98']} style={[styles.hero, isNarrow && styles.heroNarrow]}>
               <Text style={styles.heroEyebrow}>Prueba técnica frontend</Text>
-              <Text style={styles.heroTitle}>Usuarios ordenados por apellido</Text>
-              <Text style={styles.heroText}>
+              <Text style={[styles.heroTitle, isNarrow && styles.heroTitleNarrow]}>Usuarios ordenados por apellido</Text>
+              <Text style={[styles.heroText, isNarrow && styles.heroTextNarrow]}>
                 La selección múltiple solo permite avanzar en orden y agrega favoritos de forma controlada.
               </Text>
             </LinearGradient>
@@ -132,6 +151,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
               helperText={selectionHint}
               onAddSelected={handleAddSelected}
               onClear={clearSelection}
+              onRemoveSelectedFavorites={handleRemoveSelectedFavorites}
               onSelectAll={handleSelectAll}
               selectedCount={selectedIds.length}
               totalCount={data.length}
@@ -193,6 +213,9 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     gap: spacing.sm,
   },
+  heroNarrow: {
+    padding: spacing.lg,
+  },
   heroEyebrow: {
     color: '#D9E8FA',
     fontSize: 12,
@@ -205,10 +228,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '800',
   },
+  heroTitleNarrow: {
+    fontSize: 21,
+    lineHeight: 27,
+  },
   heroText: {
     color: '#F4F7FB',
     fontSize: 14,
     lineHeight: 21,
+  },
+  heroTextNarrow: {
+    fontSize: 13,
+    lineHeight: 19,
   },
   sectionHeader: {
     flexDirection: 'row',

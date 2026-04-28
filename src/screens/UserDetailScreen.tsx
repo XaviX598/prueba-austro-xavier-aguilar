@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 
 import { Screen } from '../components/Screen';
 import { StatusView } from '../components/StatusView';
@@ -14,12 +14,14 @@ type UserDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'UserDet
 const MIN_PHONE_LENGTH = 7;
 
 export const UserDetailScreen = ({ navigation, route }: UserDetailScreenProps) => {
+  const { width } = useWindowDimensions();
   const { userId } = route.params;
   const { data = [] } = useUsersQuery();
   const { getLocalPhone, isFavorite, toggleFavorite, updateLocalPhone } = useUsersLocalContext();
   const user = useMemo(() => data.find((item) => item.id === userId), [data, userId]);
   const [draftPhone, setDraftPhone] = useState(() => (user ? getLocalPhone(user.id, '') : ''));
   const [error, setError] = useState('');
+  const isNarrow = width <= 361;
 
   useEffect(() => {
     if (!user) {
@@ -70,13 +72,16 @@ export const UserDetailScreen = ({ navigation, route }: UserDetailScreenProps) =
             {user.location.city}, {user.location.country}
           </Text>
 
-          <View style={styles.heroActions}>
-            <Pressable onPress={() => navigation.goBack()} style={[styles.button, styles.secondaryButton]}>
+          <View style={[styles.heroActions, isNarrow && styles.heroActionsNarrow]}>
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={[styles.button, styles.secondaryButton, isNarrow && styles.buttonFull]}
+            >
               <Text style={[styles.buttonText, styles.secondaryButtonText]}>Volver</Text>
             </Pressable>
             <Pressable
               onPress={() => toggleFavorite(user.id)}
-              style={[styles.button, isFavorite(user.id) && styles.favoriteButton]}
+              style={[styles.button, isFavorite(user.id) && styles.favoriteButton, isNarrow && styles.buttonFull]}
             >
               <Text style={styles.buttonText}>{isFavorite(user.id) ? 'Quitar favorito' : 'Agregar favorito'}</Text>
             </Pressable>
@@ -174,6 +179,10 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.sm,
   },
+  heroActionsNarrow: {
+    width: '100%',
+    flexDirection: 'column',
+  },
   infoCard: {
     borderRadius: radius.lg,
     backgroundColor: colors.card,
@@ -237,6 +246,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     backgroundColor: colors.primary,
   },
+  buttonFull: {
+    width: '100%',
+  },
   secondaryButton: {
     backgroundColor: colors.primarySoft,
   },
@@ -253,5 +265,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 14,
+    textAlign: 'center',
   },
 });
